@@ -1,5 +1,7 @@
 'use client'
 
+import { useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Button, Heading, MultiStep, Text, TextInput } from '@verossim/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowRight } from 'phosphor-react'
@@ -7,6 +9,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 import { Container, Form, Header, FormError } from './styles'
+import { api } from '../../lib/axios'
 
 const registerFormSchema = z.object({
   username: z
@@ -27,13 +30,30 @@ export default function Register() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerFormSchema),
   })
 
+  const searchParams = useSearchParams()
+  const usernameParams = searchParams.get('username')
+
+  useEffect(() => {
+    if (usernameParams) {
+      setValue('username', usernameParams)
+    }
+  }, [usernameParams, setValue])
+
   async function handleRegister(data: RegisterFormData) {
-    console.log(data)
+    try {
+      await api.post('/users', {
+        name: data.name,
+        username: data.username,
+      })
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   return (
@@ -71,7 +91,7 @@ export default function Register() {
           )}
         </label>
 
-        <Button type="submit" disabled={isSubmitting}>
+        <Button size="md" type="submit" disabled={isSubmitting}>
           Próximo passo
           <ArrowRight />
         </Button>
