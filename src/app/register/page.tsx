@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { Button, Heading, MultiStep, Text, TextInput } from '@verossim/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowRight } from 'phosphor-react'
@@ -10,6 +10,7 @@ import { z } from 'zod'
 
 import { Container, Form, Header, FormError } from './styles'
 import { api } from '../../lib/axios'
+import { AxiosError } from 'axios'
 
 const registerFormSchema = z.object({
   username: z
@@ -36,6 +37,8 @@ export default function Register() {
     resolver: zodResolver(registerFormSchema),
   })
 
+  const router = useRouter()
+
   const searchParams = useSearchParams()
   const usernameParams = searchParams.get('username')
 
@@ -51,8 +54,15 @@ export default function Register() {
         name: data.name,
         username: data.username,
       })
+
+      router.push('/register/connect-calendar')
     } catch (err) {
-      console.log(err)
+      if (err instanceof AxiosError && err.response?.data) {
+        alert(err.response.data)
+        return
+      }
+
+      console.error(err)
     }
   }
 
