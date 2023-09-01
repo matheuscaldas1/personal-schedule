@@ -1,4 +1,4 @@
-import { styled, Box, Heading, Text } from '@verossim/react'
+import { styled, Box, Heading, Text, Button } from '@verossim/react'
 
 export const Container = styled('main', {
   maxWidth: 572,
@@ -29,6 +29,10 @@ export const Form = styled(Box, {
     display: 'flex',
     flexDirection: 'column',
     gap: '$2',
+  },
+
+  [`> ${Button}`]: {
+    height: '46px',
   },
 })
 
